@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Study Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+        :root {
+            --bg-start: #e0e7ff;
+            --bg-end: #f0f4ff;
+            --card-bg: #ffffff;
+            --accent-blue: #4f46e5;
+            --accent-blue-dark: #4338ca;
+            --accent-yellow: #f59e0b;
+            --accent-yellow-dark: #d97706;
+            --accent-red: #ef4444;
+            --accent-red-dark: #dc2626;
+            --text-color: #334155;
+            --task-bg: #f8fafc;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, var(--bg-start), var(--bg-end));
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem;
+            color: var(--text-color);
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        input[type="checkbox"] {
+            appearance: none;
+            width: 1.5rem;
+            height: 1.5rem;
+            border-radius: 0.375rem;
+            border: 2px solid #cbd5e1;
+            background-color: #f1f5f9;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+        }
+
+        input[type="checkbox"]:checked {
+            background-color: var(--accent-blue);
+            border-color: var(--accent-blue);
+            position: relative;
+        }
+
+        input[type="checkbox"]:checked::after {
+            content: '✔';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 1rem;
+        }
+
+        .input-field {
+            padding: 0.75rem;
+            border-radius: 0.75rem;
+            border: 2px solid #e2e8f0;
+            transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+        }
+
+        .button {
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            transition: all 0.2s ease-in-out;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-blue {
+            background-color: var(--accent-blue);
+            color: white;
+        }
+
+        .btn-blue:hover {
+            background-color: var(--accent-blue-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-yellow {
+            background-color: var(--accent-yellow);
+            color: white;
+        }
+        
+        .btn-yellow:hover {
+            background-color: var(--accent-yellow-dark);
+            transform: translateY(-2px);
+        }
+        
+        .btn-red {
+            background-color: var(--accent-red);
+            color: white;
+        }
+
+        .btn-red:hover {
+            background-color: var(--accent-red-dark);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app" class="w-full max-w-2xl p-8 flex flex-col gap-6 card">
+
+        <!-- Custom Title Section -->
+        <div class="flex flex-col items-center">
+            <input type="text" id="customTitle" class="w-full text-center text-4xl font-bold text-gray-800 bg-transparent border-none focus:outline-none placeholder-gray-400" placeholder="My Study Plan">
+            <p class="text-sm text-gray-400 mt-2">Click and type to add your own title!</p>
+        </div>
+
+        <!-- Task List Section -->
+        <div id="tasks-container" class="space-y-4">
+            <!-- Tasks will be dynamically loaded here -->
+            <div class="task-row p-4 bg-gray-50 rounded-xl flex items-center justify-center shadow-sm text-gray-500">
+                 টাস্ক লোড হচ্ছে...
+            </div>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="flex justify-end">
+             <button id="clearCompletedBtn" class="button btn-red text-sm py-2 px-4">
+                সম্পূর্ণ হওয়া টাস্কগুলো মুছে ফেলুন
+            </button>
+        </div>
+
+        <!-- Add Custom Task Section -->
+        <div class="p-6 bg-blue-50 rounded-2xl shadow-sm border border-blue-100 flex flex-col gap-4">
+            <h3 class="text-xl font-semibold text-blue-800">একটি নতুন টাস্ক মডেল তৈরি করুন</h3>
+            <div class="flex flex-col sm:flex-row gap-4">
+                <input type="text" id="timeStart" placeholder="যেমন, ২ ঘন্টা" class="flex-1 input-field">
+                <input type="text" id="timeEnd" placeholder="যেমন, ২০ মি" class="flex-1 input-field">
+                <button id="addTaskBtn" class="button btn-blue">
+                    টাস্ক যোগ করুন
+                </button>
+            </div>
+        </div>
+
+        <!-- Medal Section -->
+        <div class="p-6 bg-yellow-50 rounded-2xl shadow-sm border border-yellow-100 flex flex-col gap-4">
+            <h3 class="text-xl font-semibold text-yellow-800">আজকের মেডেল সেভ করুন 🏅</h3>
+            <div class="flex flex-col sm:flex-row gap-4 items-center">
+                <input type="text" id="medalInput" placeholder="আজ তুমি কী অর্জন করেছ?" class="flex-1 w-full input-field">
+                <button id="saveMedalBtn" class="button btn-yellow">
+                    মেডেল সেভ করুন
+                </button>
+            </div>
+            <div id="medalDisplay" class="mt-2 p-4 bg-yellow-100 rounded-xl text-yellow-900 font-medium hidden">
+                <!-- Saved medal will appear here -->
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot, collection, query, where, orderBy, limit, addDoc, updateDoc, deleteDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Environment variables
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        // Firebase instances
+        let db, auth, userId;
+        const tasksContainer = document.getElementById('tasks-container');
+
+        // --- Firebase Initialization and Authentication ---
+        async function initializeFirebase() {
+            try {
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+                
+                // User authentication
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                // Listen for authentication state changes
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        userId = user.uid;
+                    } else {
+                        userId = crypto.randomUUID();
+                    }
+                    console.log("Authenticated with user ID:", userId);
+                    listenForTaskChanges(userId);
+                    listenForMedalChanges(userId);
+                });
+            } catch (error) {
+                console.error("Firebase initialization failed:", error);
+            }
+        }
+
+        // --- Task Functions ---
+        async function addTaskToFirestore(timeStart, timeEnd) {
+            if (!db || !userId) {
+                console.error("Firebase not initialized or user not authenticated.");
+                return;
+            }
+
+            try {
+                await addDoc(collection(db, `artifacts/${appId}/users/${userId}/tasks`), {
+                    timeStart: timeStart,
+                    timeEnd: timeEnd,
+                    isCompletedStart: false, // New field for the first checkbox
+                    isCompletedEnd: false,   // New field for the second checkbox
+                    createdAt: new Date()
+                });
+                console.log("Task added successfully!");
+                document.getElementById('timeStart').value = '';
+                document.getElementById('timeEnd').value = '';
+            } catch (error) {
+                console.error("Error adding task:", error);
+            }
+        }
+        
+        async function updateTaskCompletion(docId, field, isCompleted) {
+            if (!db || !userId) {
+                console.error("Firebase not initialized or user not authenticated.");
+                return;
+            }
+            const taskRef = doc(db, `artifacts/${appId}/users/${userId}/tasks`, docId);
+            try {
+                await updateDoc(taskRef, {
+                    [field]: isCompleted
+                });
+                console.log("Task updated successfully!");
+            } catch (error) {
+                console.error("Error updating task:", error);
+            }
+        }
+
+        async function clearCompletedTasks() {
+            if (!db || !userId) {
+                console.error("Firebase not initialized or user not authenticated.");
+                return;
+            }
+
+            const tasksCollection = collection(db, `artifacts/${appId}/users/${userId}/tasks`);
+            const q = query(tasksCollection);
+
+            try {
+                const querySnapshot = await getDocs(q);
+                let batch = [];
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    if (data.isCompletedStart && data.isCompletedEnd) {
+                        batch.push(deleteDoc(doc.ref));
+                    }
+                });
+                await Promise.all(batch);
+                console.log("Completed tasks cleared successfully!");
+            } catch (error) {
+                console.error("Error clearing completed tasks:", error);
+            }
+        }
+
+        // Listen for real-time changes to tasks
+        function listenForTaskChanges(uid) {
+            if (!db) {
+                console.error("Firebase not initialized.");
+                return;
+            }
+            
+            const tasksCollection = collection(db, `artifacts/${appId}/users/${uid}/tasks`);
+            const q = query(tasksCollection, orderBy("createdAt"));
+
+            onSnapshot(q, (snapshot) => {
+                tasksContainer.innerHTML = '';
+                if (snapshot.empty) {
+                    tasksContainer.innerHTML = `
+                        <div class="task-row p-4 bg-gray-50 rounded-xl flex items-center justify-center shadow-sm text-gray-500">
+                             এখানে কোনো টাস্ক নেই। উপরে একটি তৈরি করুন!
+                        </div>
+                    `;
+                } else {
+                    snapshot.forEach((doc) => {
+                        const data = doc.data();
+                        const newTaskRow = document.createElement('div');
+                        newTaskRow.className = "task-row p-4 bg-gray-50 rounded-xl flex items-center justify-between shadow-sm";
+                        if (data.isCompletedStart && data.isCompletedEnd) {
+                           newTaskRow.classList.add('opacity-50', 'line-through');
+                        }
+                        
+                        const startCheckboxId = `task-start-${doc.id}`;
+                        const endCheckboxId = `task-end-${doc.id}`;
+
+                        newTaskRow.innerHTML = `
+                            <input type="checkbox" id="${startCheckboxId}" ${data.isCompletedStart ? 'checked' : ''}>
+                            <span class="text-lg font-medium text-gray-700">${data.timeStart}</span>
+                            <span class="text-lg font-medium text-gray-700">${data.timeEnd}</span>
+                            <input type="checkbox" id="${endCheckboxId}" ${data.isCompletedEnd ? 'checked' : ''}>
+                        `;
+                        tasksContainer.appendChild(newTaskRow);
+                        
+                        // Add event listeners for the checkboxes
+                        document.getElementById(startCheckboxId).addEventListener('change', (e) => {
+                           updateTaskCompletion(doc.id, 'isCompletedStart', e.target.checked);
+                        });
+                        
+                        document.getElementById(endCheckboxId).addEventListener('change', (e) => {
+                           updateTaskCompletion(doc.id, 'isCompletedEnd', e.target.checked);
+                        });
+                    });
+                }
+            }, (error) => {
+                console.error("Error listening to tasks:", error);
+            });
+        }
+
+        // --- Medal Functions (from previous version) ---
+        async function saveMedal() {
+            if (!db || !userId) {
+                console.error("Firebase not initialized or user not authenticated.");
+                return;
+            }
+
+            const medalValue = document.getElementById('medalInput').value.trim();
+            if (!medalValue) {
+                console.error("Medal value cannot be empty.");
+                return;
+            }
+
+            const now = new Date();
+            const todayDocPath = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}`;
+            const docRef = doc(db, `artifacts/${appId}/users/${userId}/medals`, todayDocPath);
+            
+            try {
+                await setDoc(docRef, {
+                    medal: medalValue,
+                    timestamp: now.toISOString()
+                });
+                console.log("Medal saved successfully!");
+                document.getElementById('medalInput').value = '';
+            } catch (error) {
+                console.error("Error saving medal:", error);
+            }
+        }
+
+        function listenForMedalChanges(uid) {
+            if (!db) {
+                console.error("Firebase not initialized.");
+                return;
+            }
+            
+            const medalsCollection = collection(db, `artifacts/${appId}/users/${uid}/medals`);
+            const q = query(medalsCollection, orderBy("timestamp", "desc"), limit(1));
+
+            onSnapshot(q, (snapshot) => {
+                const medalDisplay = document.getElementById('medalDisplay');
+                if (snapshot.empty) {
+                    medalDisplay.textContent = "আজকের জন্য কোনো মেডেল সেভ করা হয়নি।";
+                    medalDisplay.classList.remove('hidden');
+                } else {
+                    snapshot.forEach((doc) => {
+                        const data = doc.data();
+                        medalDisplay.textContent = `আজকের মেডেল: "${data.medal}"`;
+                        medalDisplay.classList.remove('hidden');
+                    });
+                }
+            }, (error) => {
+                console.error("Error listening to medals:", error);
+            });
+        }
+
+        // --- DOM Event Listeners ---
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeFirebase();
+
+            const addTaskBtn = document.getElementById('addTaskBtn');
+            const saveMedalBtn = document.getElementById('saveMedalBtn');
+            const clearCompletedBtn = document.getElementById('clearCompletedBtn');
+
+            // Add new task row
+            addTaskBtn.addEventListener('click', () => {
+                const timeStart = document.getElementById('timeStart').value.trim();
+                const timeEnd = document.getElementById('timeEnd').value.trim();
+
+                if (timeStart && timeEnd) {
+                    addTaskToFirestore(timeStart, timeEnd);
+                }
+            });
+
+            // Save medal button click
+            saveMedalBtn.addEventListener('click', saveMedal);
+            
+            // Clear completed tasks button click
+            clearCompletedBtn.addEventListener('click', clearCompletedTasks);
+        });
+    </script>
+</body>
+          </html>
+          
